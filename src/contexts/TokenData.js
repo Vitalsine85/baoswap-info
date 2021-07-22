@@ -33,7 +33,7 @@ import {
 import { timeframeOptions } from "../constants";
 import { useLatestBlocks } from "./Application";
 import { updateNameData } from "../utils/data";
-import { useBlocksSubgraphClient, useHoneyswapSubgraphClient } from "./Network";
+import { useBlocksSubgraphClient, useBaoswapSubgraphClient } from "./Network";
 
 const RESET = "RESET";
 const UPDATE = "UPDATE";
@@ -71,9 +71,9 @@ function reducer(state, { type, payload }) {
       const { topTokens } = payload;
       const newTopTokens = topTokens
         ? topTokens.reduce((reducedTokens, token) => {
-            reducedTokens[token.id] = token;
-            return reducedTokens;
-          }, {})
+          reducedTokens[token.id] = token;
+          return reducedTokens;
+        }, {})
         : {};
       return {
         ...newTopTokens,
@@ -259,100 +259,100 @@ const getTopTokens = async (
 
     let bulkResults = await Promise.all(
       current &&
-        oneDayData &&
-        twoDayData &&
-        current?.data?.tokens.map(async (token) => {
-          let data = token;
+      oneDayData &&
+      twoDayData &&
+      current?.data?.tokens.map(async (token) => {
+        let data = token;
 
-          // let liquidityDataThisToken = liquidityData?.[token.id]
-          let oneDayHistory = oneDayData?.[token.id];
-          let twoDayHistory = twoDayData?.[token.id];
+        // let liquidityDataThisToken = liquidityData?.[token.id]
+        let oneDayHistory = oneDayData?.[token.id];
+        let twoDayHistory = twoDayData?.[token.id];
 
-          // catch the case where token wasnt in top list in previous days
-          if (!oneDayHistory) {
-            let oneDayResult = await client.query({
-              query: TOKEN_DATA(token.id, oneDayBlock),
-              fetchPolicy: "network-only",
-            });
-            oneDayHistory = oneDayResult.data.tokens[0];
-          }
-          if (!twoDayHistory) {
-            let twoDayResult = await client.query({
-              query: TOKEN_DATA(token.id, twoDayBlock),
-              fetchPolicy: "network-only",
-            });
-            twoDayHistory = twoDayResult.data.tokens[0];
-          }
-
-          // calculate percentage changes and daily changes
-          const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
-            data.tradeVolumeUSD,
-            oneDayHistory?.tradeVolumeUSD ?? 0,
-            twoDayHistory?.tradeVolumeUSD ?? 0
-          );
-          const [oneDayTxns, txnChange] = get2DayPercentChange(
-            data.txCount,
-            oneDayHistory?.txCount ?? 0,
-            twoDayHistory?.txCount ?? 0
-          );
-
-          const currentLiquidityUSD =
-            data?.totalLiquidity *
-            nativeCurrencyPrice *
-            data?.derivedNativeCurrency;
-          const oldLiquidityUSD =
-            oneDayHistory?.totalLiquidity *
-            nativeCurrencyPriceOld *
-            oneDayHistory?.derivedNativeCurrency;
-
-          // percent changes
-          const priceChangeUSD = getPercentChange(
-            data?.derivedNativeCurrency * nativeCurrencyPrice,
-            oneDayHistory?.derivedNativeCurrency
-              ? oneDayHistory?.derivedNativeCurrency * nativeCurrencyPriceOld
-              : 0
-          );
-
-          // set data
-          data.priceUSD = data?.derivedNativeCurrency * nativeCurrencyPrice;
-          data.totalLiquidityUSD = currentLiquidityUSD;
-          data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD);
-          data.volumeChangeUSD = volumeChangeUSD;
-          data.priceChangeUSD = priceChangeUSD;
-          data.liquidityChangeUSD = getPercentChange(
-            currentLiquidityUSD ?? 0,
-            oldLiquidityUSD ?? 0
-          );
-          data.oneDayTxns = oneDayTxns;
-          data.txnChange = txnChange;
-
-          // new tokens
-          if (!oneDayHistory && data) {
-            data.oneDayVolumeUSD = data.tradeVolumeUSD;
-            data.oneDayVolumeNativeCurrency =
-              data.tradeVolume * data.derivedNativeCurrency;
-            data.oneDayTxns = data.txCount;
-          }
-
-          // update name data for
-          updateNameData({
-            token0: data,
+        // catch the case where token wasnt in top list in previous days
+        if (!oneDayHistory) {
+          let oneDayResult = await client.query({
+            query: TOKEN_DATA(token.id, oneDayBlock),
+            fetchPolicy: "network-only",
           });
+          oneDayHistory = oneDayResult.data.tokens[0];
+        }
+        if (!twoDayHistory) {
+          let twoDayResult = await client.query({
+            query: TOKEN_DATA(token.id, twoDayBlock),
+            fetchPolicy: "network-only",
+          });
+          twoDayHistory = twoDayResult.data.tokens[0];
+        }
 
-          // HOTFIX for Aave
-          if (data.id === "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9") {
-            const aaveData = await client.query({
-              query: PAIR_DATA("0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f"),
-              fetchPolicy: "network-only",
-            });
-            const result = aaveData.data.pairs[0];
-            data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2;
-            data.liquidityChangeUSD = 0;
-            data.priceChangeUSD = 0;
-          }
+        // calculate percentage changes and daily changes
+        const [oneDayVolumeUSD, volumeChangeUSD] = get2DayPercentChange(
+          data.tradeVolumeUSD,
+          oneDayHistory?.tradeVolumeUSD ?? 0,
+          twoDayHistory?.tradeVolumeUSD ?? 0
+        );
+        const [oneDayTxns, txnChange] = get2DayPercentChange(
+          data.txCount,
+          oneDayHistory?.txCount ?? 0,
+          twoDayHistory?.txCount ?? 0
+        );
 
-          return data;
-        })
+        const currentLiquidityUSD =
+          data?.totalLiquidity *
+          nativeCurrencyPrice *
+          data?.derivedNativeCurrency;
+        const oldLiquidityUSD =
+          oneDayHistory?.totalLiquidity *
+          nativeCurrencyPriceOld *
+          oneDayHistory?.derivedNativeCurrency;
+
+        // percent changes
+        const priceChangeUSD = getPercentChange(
+          data?.derivedNativeCurrency * nativeCurrencyPrice,
+          oneDayHistory?.derivedNativeCurrency
+            ? oneDayHistory?.derivedNativeCurrency * nativeCurrencyPriceOld
+            : 0
+        );
+
+        // set data
+        data.priceUSD = data?.derivedNativeCurrency * nativeCurrencyPrice;
+        data.totalLiquidityUSD = currentLiquidityUSD;
+        data.oneDayVolumeUSD = parseFloat(oneDayVolumeUSD);
+        data.volumeChangeUSD = volumeChangeUSD;
+        data.priceChangeUSD = priceChangeUSD;
+        data.liquidityChangeUSD = getPercentChange(
+          currentLiquidityUSD ?? 0,
+          oldLiquidityUSD ?? 0
+        );
+        data.oneDayTxns = oneDayTxns;
+        data.txnChange = txnChange;
+
+        // new tokens
+        if (!oneDayHistory && data) {
+          data.oneDayVolumeUSD = data.tradeVolumeUSD;
+          data.oneDayVolumeNativeCurrency =
+            data.tradeVolume * data.derivedNativeCurrency;
+          data.oneDayTxns = data.txCount;
+        }
+
+        // update name data for
+        updateNameData({
+          token0: data,
+        });
+
+        // HOTFIX for Aave
+        if (data.id === "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9") {
+          const aaveData = await client.query({
+            query: PAIR_DATA("0xdfc14d2af169b0d36c4eff567ada9b2e0cae044f"),
+            fetchPolicy: "network-only",
+          });
+          const result = aaveData.data.pairs[0];
+          data.totalLiquidityUSD = parseFloat(result.reserveUSD) / 2;
+          data.liquidityChangeUSD = 0;
+          data.priceChangeUSD = 0;
+        }
+
+        return data;
+      })
     );
 
     return bulkResults;
@@ -452,7 +452,7 @@ const getTokenData = async (
     const priceChangeUSD = getPercentChange(
       data?.derivedNativeCurrency * nativeCurrencyPrice,
       parseFloat(oneDayData?.derivedNativeCurrency ?? 0) *
-        nativeCurrencyPriceOld
+      nativeCurrencyPriceOld
     );
 
     const currentLiquidityUSD =
@@ -700,7 +700,7 @@ const getTokenChartData = async (client, tokenAddress) => {
 };
 
 export function Updater() {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [, { updateTopTokens }] = useTokenDataContext();
   const [
@@ -732,7 +732,7 @@ export function Updater() {
 }
 
 export function useTokenData(tokenAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { update }] = useTokenDataContext();
   const [
@@ -772,7 +772,7 @@ export function useTokenData(tokenAddress) {
 }
 
 export function useTokenTransactions(tokenAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { updateTokenTxns }] = useTokenDataContext();
   const tokenTxns = state?.[tokenAddress]?.txns;
@@ -808,7 +808,7 @@ export function useTokenTransactions(tokenAddress) {
 }
 
 export function useTokenPairs(tokenAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { updateAllPairs }] = useTokenDataContext();
   const tokenPairs = state?.[tokenAddress]?.[TOKEN_PAIRS_KEY];
@@ -827,7 +827,7 @@ export function useTokenPairs(tokenAddress) {
 }
 
 export function useTokenChartData(tokenAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { updateChartData }] = useTokenDataContext();
   const chartData = state?.[tokenAddress]?.chartData;
@@ -851,7 +851,7 @@ export function useTokenChartData(tokenAddress) {
  * @param {*} interval  // the chunk size in seconds - default is 1 hour of 3600s
  */
 export function useTokenPriceData(tokenAddress, timeWindow, interval = 3600) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { updatePriceData }] = useTokenDataContext();
   const chartData = state?.[tokenAddress]?.[timeWindow]?.[interval];

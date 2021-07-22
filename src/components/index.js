@@ -9,7 +9,8 @@ import { useSelectedNetwork } from "../contexts/Network";
 
 const Divider = styled(Box)`
   height: 1px;
-  background-color: ${({ theme }) => theme.divider};
+  border: 1px solid rgb(226, 214, 207);
+  rgb(247 244 242) 1px 1px 0px inset
 `;
 
 export const IconWrapper = styled.div`

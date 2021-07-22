@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import styled from "styled-components";
 import MaticLogo from "../../assets/matic-logo.png";
 import xDAILogo from "../../assets/xdai-logo.png";
-import HNYLogo from "../../assets/hny-logo.png";
+import BAOLogo from "../../assets/bao-logo.png";
 import {
   useNativeCurrencyWrapper,
   useSelectedNetwork,
 } from "../../contexts/Network.js";
-import { HNY_ADDRESS, SupportedNetwork } from "../../constants/index.js";
+import { BAO_ADDRESS, SupportedNetwork } from "../../constants/index.js";
 import { useTokenIcon } from "../../hooks/useTokenIcon.js";
 
 const Inline = styled.div`
@@ -42,8 +42,8 @@ export default function TokenLogo({
     if (lowercaseAddress === nativeCurrencyWrapper.address.toLowerCase()) {
       return [selectedNetwork === SupportedNetwork.XDAI ? xDAILogo : MaticLogo];
     }
-    if (lowercaseAddress === HNY_ADDRESS[selectedNetwork].toLowerCase()) {
-      return [HNYLogo];
+    if (lowercaseAddress === BAO_ADDRESS[selectedNetwork].toLowerCase()) {
+      return [BAOLogo];
     }
     return [tokenIcon];
   }, [address, tokenIcon, nativeCurrencyWrapper, selectedNetwork]);

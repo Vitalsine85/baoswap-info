@@ -6,7 +6,7 @@ import copy from 'copy-to-clipboard'
 import { useTokenIcon } from "./useTokenIcon"
 
 export function useColor(tokenAddress, token) {
-  const [color, setColor] = useState('#2172E5')
+  const [color, setColor] = useState('#ce6509')
 
   const path = useTokenIcon(tokenAddress)
 
@@ -14,13 +14,13 @@ export function useColor(tokenAddress, token) {
     Vibrant.from(path).getPalette((err, palette) => {
       if (palette && palette.Vibrant) {
         let detectedHex = palette.Vibrant.hex
-        let AAscore = hex(detectedHex, '#FFF')
+        let AAscore = hex(detectedHex, '#50251c')
         while (AAscore < 3) {
           detectedHex = shade(0.005, detectedHex)
-          AAscore = hex(detectedHex, '#FFF')
+          AAscore = hex(detectedHex, '#50251c')
         }
         if (token === 'DAI') {
-          setColor('#FAAB14')
+          setColor('#50251c')
         } else {
           setColor(detectedHex)
         }

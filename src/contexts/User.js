@@ -20,7 +20,7 @@ import utc from "dayjs/plugin/utc";
 import { useNativeCurrencyPrice } from "./GlobalData";
 import { getLPReturnsOnPair, getHistoricalPairReturns } from "../utils/returns";
 import { timeframeOptions } from "../constants";
-import { useBlocksSubgraphClient, useHoneyswapSubgraphClient } from "./Network";
+import { useBlocksSubgraphClient, useBaoswapSubgraphClient } from "./Network";
 
 dayjs.extend(utc);
 
@@ -195,7 +195,7 @@ export default function Provider({ children }) {
 }
 
 export function useUserTransactions(account) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const [state, { updateTransactions }] = useUserContext();
   const transactions = state?.[account]?.[TRANSACTIONS_KEY];
   useEffect(() => {
@@ -229,7 +229,7 @@ export function useUserTransactions(account) {
  * @param {*} account
  */
 export function useUserSnapshots(account) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const [state, { updateUserSnapshots }] = useUserContext();
   const snapshots = state?.[account]?.[USER_SNAPSHOTS];
 
@@ -279,7 +279,7 @@ export function useUserSnapshots(account) {
  * @param {*} account
  */
 export function useUserPositionChart(position, account) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const pairAddress = position?.pair?.id;
   const [state, { updateUserPairReturns }] = useUserContext();
@@ -351,7 +351,7 @@ export function useUserPositionChart(position, account) {
  * and usd liquidity value.
  */
 export function useUserLiquidityChart(account) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const history = useUserSnapshots(account);
   // formatetd array to return for chart data
   const [formattedHistory, setFormattedHistory] = useState();
@@ -478,10 +478,10 @@ export function useUserLiquidityChart(account) {
             totalUSD +
             (ownershipPerPair[dayData.pairAddress]
               ? (parseFloat(
-                  ownershipPerPair[dayData.pairAddress].lpTokenBalance
-                ) /
-                  parseFloat(dayData.totalSupply)) *
-                parseFloat(dayData.reserveUSD)
+                ownershipPerPair[dayData.pairAddress].lpTokenBalance
+              ) /
+                parseFloat(dayData.totalSupply)) *
+              parseFloat(dayData.reserveUSD)
               : 0));
         }, 0);
 
@@ -502,7 +502,7 @@ export function useUserLiquidityChart(account) {
 }
 
 export function useUserPositions(account) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const [state, { updatePositions }] = useUserContext();
   const positions = state?.[account]?.[POSITIONS_KEY];
 

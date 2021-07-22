@@ -3,13 +3,13 @@ import { BUNDLE_ID, FACTORY_ADDRESS, SupportedNetwork } from "../constants";
 
 const FACTORY_STARTING_BLOCK = {
   // [FACTORY_ADDRESS[SupportedNetwork.MAINNET]]: 10000000,
-  [FACTORY_ADDRESS[SupportedNetwork.XDAI]]: 11813490,
-  [FACTORY_ADDRESS[SupportedNetwork.MATIC]]: 14599890,
+  [FACTORY_ADDRESS[SupportedNetwork.XDAI]]: 14515972,
+  // [FACTORY_ADDRESS[SupportedNetwork.MATIC]]: 14599890,
 };
 
 export const SUBGRAPH_HEALTH = gql`
   query health {
-    indexingStatusForCurrentVersion(subgraphName: "1hive/honeyswap-xdai") {
+    indexingStatusForCurrentVersion(subgraphName: "vitalsine85/baoswap") {
       synced
       health
       chains {
@@ -42,9 +42,8 @@ export const GET_BLOCK = gql`
 export const GET_BLOCKS = (timestamps) => {
   let queryString = "query blocks {";
   queryString += timestamps.map((timestamp) => {
-    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${
-      timestamp + 600
-    } }) {
+    return `t${timestamp}:blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_gt: ${timestamp}, timestamp_lt: ${timestamp + 600
+      } }) {
       number
     }`;
   });
@@ -405,8 +404,8 @@ export const PAIR_DAY_DATA_BULK = (pairs, startTimestamp) => {
 };
 
 export const GLOBAL_CHART = gql`
-  query honeyswapDayDatas($startTime: Int!, $skip: Int!) {
-    honeyswapDayDatas(
+  query baoswapDayDatas($startTime: Int!, $skip: Int!) {
+    baoswapDayDatas(
       first: 1000
       skip: $skip
       where: { date_gt: $startTime }
@@ -425,17 +424,15 @@ export const GLOBAL_CHART = gql`
 `;
 
 export const GLOBAL_DATA = (factoryAddress, block) => {
-  const queryString = ` query honeyswapFactories {
-      honeyswapFactories(
-       ${
-         block
-           ? `block: { number: ${
-               block > FACTORY_STARTING_BLOCK[factoryAddress]
-                 ? block
-                 : FACTORY_STARTING_BLOCK[factoryAddress]
-             }}`
-           : ``
-       } 
+  const queryString = ` query baoswapFactories {
+      baoswapFactories(
+       ${block
+      ? `block: { number: ${block > FACTORY_STARTING_BLOCK[factoryAddress]
+        ? block
+        : FACTORY_STARTING_BLOCK[factoryAddress]
+      }}`
+      : ``
+    } 
        where: { id: "${factoryAddress}" }) {
         id
         totalVolumeUSD
@@ -682,9 +679,8 @@ export const PAIR_DATA = (pairAddress, block) => {
   const queryString = `
     ${PairFields}
     query pairs {
-      pairs(${
-        block ? `block: {number: ${block}}` : ``
-      } where: { id: "${pairAddress}"} ) {
+      pairs(${block ? `block: {number: ${block}}` : ``
+    } where: { id: "${pairAddress}"} ) {
         ...PairFields
       }
     }`;
@@ -809,9 +805,8 @@ export const TOKEN_DATA = (tokenAddress, block) => {
   const queryString = `
     ${TokenFields}
     query tokens {
-      tokens(${
-        block ? `block : {number: ${block}}` : ``
-      } where: {id:"${tokenAddress}"}) {
+      tokens(${block ? `block : {number: ${block}}` : ``
+    } where: {id:"${tokenAddress}"}) {
         ...TokenFields
       }
       pairs0: pairs(where: {token0: "${tokenAddress}"}, first: 50, orderBy: reserveUSD, orderDirection: desc){

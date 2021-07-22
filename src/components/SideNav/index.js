@@ -19,7 +19,7 @@ import { SupportedNetwork } from "../../constants";
 
 const Wrapper = styled.div`
   height: ${({ isMobile }) => (isMobile ? "initial" : "100vh")};
-  background-color: ${({ theme }) => transparentize(0.4, theme.bg1)};
+  background-color: ${({ theme }) => transparentize(0.4, '#50251c')};
   color: ${({ theme }) => theme.text1};
   padding: 0.5rem 0.5rem 0.5rem 0.75rem;
   position: sticky;
@@ -27,7 +27,6 @@ const Wrapper = styled.div`
   z-index: 9999;
   box-sizing: border-box;
   /* background-color: #1b1c22; */
-  background: linear-gradient(193.68deg, #1b1c22 0.68%, #000000 100.48%);
   color: ${({ theme }) => theme.bg2};
 
   @media screen and (max-width: 800px) {
@@ -130,11 +129,11 @@ function SideNav({ history }) {
             style={{ marginLeft: ".75rem", marginTop: "1.5rem" }}
           >
             <Title />
-            <DropdownSelect
+            {/* <DropdownSelect
               active={selectedNetwork}
               setActive={handleSelectedNetworkChange}
               options={Object.values(SupportedNetwork)}
-            />
+            /> */}
             {!below1080 && (
               <AutoColumn gap="1.25rem" style={{ marginTop: "1rem" }}>
                 <BasicLink to="/home">
@@ -177,7 +176,7 @@ function SideNav({ history }) {
                     activeText={
                       (history.location.pathname.split("/")[1] === "accounts" ||
                         history.location.pathname.split("/")[1] ===
-                          "account") ??
+                        "account") ??
                       undefined
                     }
                   >
@@ -193,12 +192,12 @@ function SideNav({ history }) {
             style={{ marginLeft: ".75rem", marginBottom: "4rem" }}
           >
             <HeaderText>
-              <Link href="https://1hive.org" target="_blank">
-                1Hive
+              <Link href="https://docs.bao.finance" target="_blank">
+                Docs
               </Link>
             </HeaderText>
             <HeaderText>
-              <Link href="https://twitter.com/1HiveOrg" target="_blank">
+              <Link href="https://twitter.com/thebaoman" target="_blank">
                 Twitter
               </Link>
             </HeaderText>

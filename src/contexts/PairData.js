@@ -34,7 +34,7 @@ import {
 import { timeframeOptions } from "../constants";
 import { useLatestBlocks } from "./Application";
 import { updateNameData } from "../utils/data";
-import { useBlocksSubgraphClient, useHoneyswapSubgraphClient } from "./Network";
+import { useBlocksSubgraphClient, useBaoswapSubgraphClient } from "./Network";
 
 const RESET = "RESET";
 const UPDATE = "UPDATE";
@@ -48,12 +48,12 @@ dayjs.extend(utc);
 export function safeAccess(object, path) {
   return object
     ? path.reduce(
-        (accumulator, currentValue) =>
-          accumulator && accumulator[currentValue]
-            ? accumulator[currentValue]
-            : null,
-        object
-      )
+      (accumulator, currentValue) =>
+        accumulator && accumulator[currentValue]
+          ? accumulator[currentValue]
+          : null,
+      object
+    )
     : null;
 }
 
@@ -82,9 +82,9 @@ function reducer(state, { type, payload }) {
       const { topPairs } = payload;
       const newTopPairs = topPairs
         ? topPairs.reduce((reducedPairs, pair) => {
-            reducedPairs[pair.id] = pair;
-            return reducedPairs;
-          }, {})
+          reducedPairs[pair.id] = pair;
+          return reducedPairs;
+        }, {})
         : {};
       return {
         ...newTopPairs,
@@ -260,42 +260,42 @@ async function getBulkPairData(
 
     let pairData = await Promise.all(
       current &&
-        current.data.pairs.map(async (pair) => {
-          let data = pair;
-          let oneDayHistory = oneDayData?.[pair.id];
-          if (!oneDayHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, b1),
-              fetchPolicy: "network-only",
-            });
-            oneDayHistory = newData.data.pairs[0];
-          }
-          let twoDayHistory = twoDayData?.[pair.id];
-          if (!twoDayHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, b2),
-              fetchPolicy: "network-only",
-            });
-            twoDayHistory = newData.data.pairs[0];
-          }
-          let oneWeekHistory = oneWeekData?.[pair.id];
-          if (!oneWeekHistory) {
-            let newData = await client.query({
-              query: PAIR_DATA(pair.id, bWeek),
-              fetchPolicy: "network-only",
-            });
-            oneWeekHistory = newData.data.pairs[0];
-          }
-          data = parseData(
-            data,
-            oneDayHistory,
-            twoDayHistory,
-            oneWeekHistory,
-            nativeCurrencyPrice,
-            b1
-          );
-          return data;
-        })
+      current.data.pairs.map(async (pair) => {
+        let data = pair;
+        let oneDayHistory = oneDayData?.[pair.id];
+        if (!oneDayHistory) {
+          let newData = await client.query({
+            query: PAIR_DATA(pair.id, b1),
+            fetchPolicy: "network-only",
+          });
+          oneDayHistory = newData.data.pairs[0];
+        }
+        let twoDayHistory = twoDayData?.[pair.id];
+        if (!twoDayHistory) {
+          let newData = await client.query({
+            query: PAIR_DATA(pair.id, b2),
+            fetchPolicy: "network-only",
+          });
+          twoDayHistory = newData.data.pairs[0];
+        }
+        let oneWeekHistory = oneWeekData?.[pair.id];
+        if (!oneWeekHistory) {
+          let newData = await client.query({
+            query: PAIR_DATA(pair.id, bWeek),
+            fetchPolicy: "network-only",
+          });
+          oneWeekHistory = newData.data.pairs[0];
+        }
+        data = parseData(
+          data,
+          oneDayHistory,
+          twoDayHistory,
+          oneWeekHistory,
+          nativeCurrencyPrice,
+          b1
+        );
+        return data;
+      })
     );
     return pairData;
   } catch (e) {
@@ -533,7 +533,7 @@ const getHourlyRateData = async (
 };
 
 export function Updater() {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [, { updateTopPairs }] = usePairDataContext();
   const [nativeCurrencyPrice] = useNativeCurrencyPrice();
@@ -568,7 +568,7 @@ export function Updater() {
 }
 
 export function useHourlyRateData(pairAddress, timeWindow) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { updateHourlyData }] = usePairDataContext();
   const chartData = state?.[pairAddress]?.hourlyData?.[timeWindow];
@@ -613,7 +613,7 @@ export function useHourlyRateData(pairAddress, timeWindow) {
  * store these updates to reduce future redundant calls
  */
 export function useDataForList(pairList) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state] = usePairDataContext();
   const [nativeCurrencyPrice] = useNativeCurrencyPrice();
@@ -686,7 +686,7 @@ export function useDataForList(pairList) {
  * Get all the current and 24hr changes for a pair
  */
 export function usePairData(pairAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const blockClient = useBlocksSubgraphClient();
   const [state, { update }] = usePairDataContext();
   const [nativeCurrencyPrice] = useNativeCurrencyPrice();
@@ -721,7 +721,7 @@ export function usePairData(pairAddress) {
  * Get most recent txns for a pair
  */
 export function usePairTransactions(pairAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const [state, { updatePairTxns }] = usePairDataContext();
   const pairTxns = state?.[pairAddress]?.txns;
   useEffect(() => {
@@ -737,7 +737,7 @@ export function usePairTransactions(pairAddress) {
 }
 
 export function usePairChartData(pairAddress) {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   const [state, { updateChartData }] = usePairDataContext();
   const chartData = state?.[pairAddress]?.chartData;
 

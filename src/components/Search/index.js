@@ -21,7 +21,7 @@ import { PAIR_SEARCH, TOKEN_SEARCH } from "../../apollo/queries";
 import FormattedName from "../FormattedName";
 import { TYPE } from "../../Theme";
 import { updateNameData } from "../../utils/data";
-import { useHoneyswapSubgraphClient } from "../../contexts/Network";
+import { useBaoswapSubgraphClient } from "../../contexts/Network";
 
 const Container = styled.div`
   height: 48px;
@@ -40,6 +40,7 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: flex-end;
   padding: 12px 16px;
+  border: 1px solid rgb(226, 214, 207);
   border-radius: 12px;
   background: ${({ theme, small, open }) =>
     small
@@ -53,16 +54,9 @@ const Wrapper = styled.div`
   width: 100%;
   min-width: 300px;
   box-sizing: border-box;
-  box-shadow: ${({ open, small }) =>
-    !open && !small
-      ? "0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) "
-      : "none"};
+  box-shadow: rgb(247 244 242) 1px 1px 0px inset;
   @media screen and (max-width: 500px) {
     background: ${({ theme }) => transparentize(0.4, theme.bg1)};
-    box-shadow: ${({ open }) =>
-      !open
-        ? "0px 24px 32px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04) "
-        : "none"};
   }
 `;
 const Input = styled.input`
@@ -122,10 +116,11 @@ const Menu = styled.div`
   left: 0;
   padding-bottom: 20px;
   background: ${({ theme }) => theme.bg6};
+  border: 1px solid rgb(226, 214, 207);
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04),
-    0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.04);
+    0px 16px 24px rgba(0, 0, 0, 0.04), 0px 24px 32px rgba(0, 0, 0, 0.04), rgb(247 244 242) 1px 1px 0px inset;
   display: ${({ hide }) => hide && "none"};
 `;
 
@@ -158,7 +153,7 @@ const Blue = styled.span`
 `;
 
 export const Search = ({ small = false }) => {
-  const client = useHoneyswapSubgraphClient();
+  const client = useBaoswapSubgraphClient();
   let allTokens = useAllTokensInSwapr();
   const allTokenData = useAllTokenData();
 
@@ -283,132 +278,132 @@ export const Search = ({ small = false }) => {
   const filteredTokenList = useMemo(() => {
     return uniqueTokens
       ? uniqueTokens
-          .sort((a, b) => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
-              return 1;
-            }
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
-              return -1;
-            }
-            const tokenA = allTokenData[a.id];
-            const tokenB = allTokenData[b.id];
-            if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1;
-            }
-            if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
-              return -1;
-            }
-            if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
-              return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1;
-            }
+        .sort((a, b) => {
+          if (OVERVIEW_TOKEN_BLACKLIST.includes(a.id)) {
             return 1;
-          })
-          .filter((token) => {
-            if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
-              return false;
+          }
+          if (OVERVIEW_TOKEN_BLACKLIST.includes(b.id)) {
+            return -1;
+          }
+          const tokenA = allTokenData[a.id];
+          const tokenB = allTokenData[b.id];
+          if (tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+            return tokenA.oneDayVolumeUSD > tokenB.oneDayVolumeUSD ? -1 : 1;
+          }
+          if (tokenA?.oneDayVolumeUSD && !tokenB?.oneDayVolumeUSD) {
+            return -1;
+          }
+          if (!tokenA?.oneDayVolumeUSD && tokenB?.oneDayVolumeUSD) {
+            return tokenA?.totalLiquidity > tokenB?.totalLiquidity ? -1 : 1;
+          }
+          return 1;
+        })
+        .filter((token) => {
+          if (OVERVIEW_TOKEN_BLACKLIST.includes(token.id)) {
+            return false;
+          }
+          const regexMatches = Object.keys(token).map((tokenEntryKey) => {
+            const isAddress = value.slice(0, 2) === "0x";
+            if (tokenEntryKey === "id" && isAddress) {
+              return token[tokenEntryKey].match(
+                new RegExp(escapeRegExp(value), "i")
+              );
             }
-            const regexMatches = Object.keys(token).map((tokenEntryKey) => {
-              const isAddress = value.slice(0, 2) === "0x";
-              if (tokenEntryKey === "id" && isAddress) {
-                return token[tokenEntryKey].match(
-                  new RegExp(escapeRegExp(value), "i")
-                );
-              }
-              if (tokenEntryKey === "symbol" && !isAddress) {
-                return token[tokenEntryKey].match(
-                  new RegExp(escapeRegExp(value), "i")
-                );
-              }
-              if (tokenEntryKey === "name" && !isAddress) {
-                return token[tokenEntryKey].match(
-                  new RegExp(escapeRegExp(value), "i")
-                );
-              }
-              return false;
-            });
-            return regexMatches.some((m) => m);
-          })
+            if (tokenEntryKey === "symbol" && !isAddress) {
+              return token[tokenEntryKey].match(
+                new RegExp(escapeRegExp(value), "i")
+              );
+            }
+            if (tokenEntryKey === "name" && !isAddress) {
+              return token[tokenEntryKey].match(
+                new RegExp(escapeRegExp(value), "i")
+              );
+            }
+            return false;
+          });
+          return regexMatches.some((m) => m);
+        })
       : [];
   }, [allTokenData, uniqueTokens, value]);
 
   const filteredPairList = useMemo(() => {
     return uniquePairs
       ? uniquePairs
-          .sort((a, b) => {
-            const pairA = allPairData[a.id];
-            const pairB = allPairData[b.id];
-            if (
-              pairA?.trackedReserveNativeCurrency &&
-              pairB?.trackedReserveNativeCurrency
-            ) {
-              return parseFloat(pairA.trackedReserveNativeCurrency) >
-                parseFloat(pairB.trackedReserveNativeCurrency)
-                ? -1
-                : 1;
+        .sort((a, b) => {
+          const pairA = allPairData[a.id];
+          const pairB = allPairData[b.id];
+          if (
+            pairA?.trackedReserveNativeCurrency &&
+            pairB?.trackedReserveNativeCurrency
+          ) {
+            return parseFloat(pairA.trackedReserveNativeCurrency) >
+              parseFloat(pairB.trackedReserveNativeCurrency)
+              ? -1
+              : 1;
+          }
+          if (
+            pairA?.trackedReserveNativeCurrency &&
+            !pairB?.trackedReserveNativeCurrency
+          ) {
+            return -1;
+          }
+          if (
+            !pairA?.trackedReserveNativeCurrency &&
+            pairB?.trackedReserveNativeCurrency
+          ) {
+            return 1;
+          }
+          return 0;
+        })
+        .filter((pair) => {
+          if (PAIR_BLACKLIST.includes(pair.id)) {
+            return false;
+          }
+          if (value && value.includes(" ")) {
+            const pairA = value.split(" ")[0]?.toUpperCase();
+            const pairB = value.split(" ")[1]?.toUpperCase();
+            return (
+              (pair.token0.symbol.includes(pairA) ||
+                pair.token0.symbol.includes(pairB)) &&
+              (pair.token1.symbol.includes(pairA) ||
+                pair.token1.symbol.includes(pairB))
+            );
+          }
+          if (value && value.includes("-")) {
+            const pairA = value.split("-")[0]?.toUpperCase();
+            const pairB = value.split("-")[1]?.toUpperCase();
+            return (
+              (pair.token0.symbol.includes(pairA) ||
+                pair.token0.symbol.includes(pairB)) &&
+              (pair.token1.symbol.includes(pairA) ||
+                pair.token1.symbol.includes(pairB))
+            );
+          }
+          const regexMatches = Object.keys(pair).map((field) => {
+            const isAddress = value.slice(0, 2) === "0x";
+            if (field === "id" && isAddress) {
+              return pair[field].match(new RegExp(escapeRegExp(value), "i"));
             }
-            if (
-              pairA?.trackedReserveNativeCurrency &&
-              !pairB?.trackedReserveNativeCurrency
-            ) {
-              return -1;
-            }
-            if (
-              !pairA?.trackedReserveNativeCurrency &&
-              pairB?.trackedReserveNativeCurrency
-            ) {
-              return 1;
-            }
-            return 0;
-          })
-          .filter((pair) => {
-            if (PAIR_BLACKLIST.includes(pair.id)) {
-              return false;
-            }
-            if (value && value.includes(" ")) {
-              const pairA = value.split(" ")[0]?.toUpperCase();
-              const pairB = value.split(" ")[1]?.toUpperCase();
+            if (field === "token0") {
               return (
-                (pair.token0.symbol.includes(pairA) ||
-                  pair.token0.symbol.includes(pairB)) &&
-                (pair.token1.symbol.includes(pairA) ||
-                  pair.token1.symbol.includes(pairB))
+                pair[field].symbol.match(
+                  new RegExp(escapeRegExp(value), "i")
+                ) ||
+                pair[field].name.match(new RegExp(escapeRegExp(value), "i"))
               );
             }
-            if (value && value.includes("-")) {
-              const pairA = value.split("-")[0]?.toUpperCase();
-              const pairB = value.split("-")[1]?.toUpperCase();
+            if (field === "token1") {
               return (
-                (pair.token0.symbol.includes(pairA) ||
-                  pair.token0.symbol.includes(pairB)) &&
-                (pair.token1.symbol.includes(pairA) ||
-                  pair.token1.symbol.includes(pairB))
+                pair[field].symbol.match(
+                  new RegExp(escapeRegExp(value), "i")
+                ) ||
+                pair[field].name.match(new RegExp(escapeRegExp(value), "i"))
               );
             }
-            const regexMatches = Object.keys(pair).map((field) => {
-              const isAddress = value.slice(0, 2) === "0x";
-              if (field === "id" && isAddress) {
-                return pair[field].match(new RegExp(escapeRegExp(value), "i"));
-              }
-              if (field === "token0") {
-                return (
-                  pair[field].symbol.match(
-                    new RegExp(escapeRegExp(value), "i")
-                  ) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), "i"))
-                );
-              }
-              if (field === "token1") {
-                return (
-                  pair[field].symbol.match(
-                    new RegExp(escapeRegExp(value), "i")
-                  ) ||
-                  pair[field].name.match(new RegExp(escapeRegExp(value), "i"))
-                );
-              }
-              return false;
-            });
-            return regexMatches.some((m) => m);
-          })
+            return false;
+          });
+          return regexMatches.some((m) => m);
+        })
       : [];
   }, [allPairData, uniquePairs, value]);
 
@@ -471,12 +466,12 @@ export const Search = ({ small = false }) => {
             small
               ? ""
               : below410
-              ? "Search..."
-              : below470
-              ? "Search Honeyswap..."
-              : below700
-              ? "Search pairs and tokens..."
-              : "Search Honeyswap pairs and tokens..."
+                ? "Search..."
+                : below470
+                  ? "Search Baoswap..."
+                  : below700
+                    ? "Search pairs and tokens..."
+                    : "Search Baoswap pairs and tokens..."
           }
           value={value}
           onChange={(e) => {

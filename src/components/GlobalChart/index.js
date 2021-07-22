@@ -86,7 +86,7 @@ const GlobalChart = ({ display }) => {
           options={CHART_VIEW}
           active={chartView}
           setActive={setChartView}
-          color={"#4526A2"}
+          color={"#ce6509"}
         />
       )}
 

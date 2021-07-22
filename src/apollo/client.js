@@ -14,14 +14,14 @@ export const clients = {
   // }),
   [SupportedNetwork.XDAI]: new ApolloClient({
     link: new HttpLink({
-      uri: "https://api.thegraph.com/subgraphs/name/1hive/honeyswap-xdai",
+      uri: "https://api.thegraph.com/subgraphs/name/vitalsine85/baoswap",
     }),
     cache: new InMemoryCache(),
     shouldBatch: true,
   }),
   [SupportedNetwork.MATIC]: new ApolloClient({
     link: new HttpLink({
-      uri: "https://api.thegraph.com/subgraphs/name/1hive/honeyswap-polygon",
+      uri: "https://api.thegraph.com/subgraphs/name/1hive/baoswap-polygon",
     }),
     cache: new InMemoryCache(),
     shouldBatch: true,

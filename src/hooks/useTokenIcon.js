@@ -18,7 +18,7 @@ async function getTokenLogo(network, address) {
     //   tokenListURL = "https://tokens.coingecko.com/uniswap/all.json"; // coingecko list used for mainnet
     // }
     if (network === SupportedNetwork.XDAI) {
-      tokenListURL = "https://tokens.honeyswap.org"; // honeyswap list used for xdai
+      tokenListURL = "https://tokens.baoswap.org"; // baoswap list used for xdai
     } else {
       tokenListURL =
         "https://unpkg.com/quickswap-default-token-list@latest/build/quickswap-default.tokenlist.json";

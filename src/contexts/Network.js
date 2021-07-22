@@ -126,7 +126,7 @@ export function useSelectedNetworkUpdater() {
   };
 }
 
-export function useHoneyswapSubgraphClient() {
+export function useBaoswapSubgraphClient() {
   const [state] = useNetworkContext();
   return clients[state.selectedNetwork];
 }

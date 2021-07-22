@@ -18,7 +18,7 @@ export const SupportedNetworkForChainId = Object.freeze({
 
 export const FACTORY_ADDRESS = {
   // [SupportedNetwork.MAINNET]: "0xd34971BaB6E5E356fd250715F5dE0492BB070452",
-  [SupportedNetwork.XDAI]: "0xa818b4f111ccac7aa31d0bcc0806d64f2e0737d7",
+  [SupportedNetwork.XDAI]: "0x45DE240fbE2077dd3e711299538A09854FAE9c9b",
   [SupportedNetwork.MATIC]: "0x03daa61d8007443a6584e3d8f85105096543c19c",
 };
 
@@ -43,9 +43,9 @@ export const NATIVE_CURRENCY_WRAPPER = {
   },
 };
 
-export const HNY_ADDRESS = {
+export const BAO_ADDRESS = {
   // [SupportedNetwork.MAINNET]: "0xc3589f56b6869824804a5ea29f2c9886af1b0fce",
-  [SupportedNetwork.XDAI]: "0x71850b7E9Ee3f13Ab46d67167341E4bDc905Eef9",
+  [SupportedNetwork.XDAI]: "0x82dFe19164729949fD66Da1a37BC70dD6c4746ce",
   [SupportedNetwork.MATIC]: "0xb371248Dd0f9E4061ccf8850E9223Ca48Aa7CA4b",
 };
 

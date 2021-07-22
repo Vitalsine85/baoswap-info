@@ -51,26 +51,23 @@ export function getPoolLink(
 ) {
   if (!token1Address) {
     return (
-      `https://app.honeyswap.org/#/` +
+      `https://www.baoswap.xyz/#/` +
       (remove ? `remove` : `add`) +
-      `/${
-        token0Address === nativeCurrencyWrapper.symbol
-          ? nativeCurrency
-          : token0Address
+      `/${token0Address === nativeCurrencyWrapper.symbol
+        ? nativeCurrency
+        : token0Address
       }/${nativeCurrency}?chainId=${ChainId[selectedNetwork]}`
     );
   } else {
     return (
-      `https://app.honeyswap.org/#/` +
+      `https://www.baoswap.xyz/#/` +
       (remove ? `remove` : `add`) +
-      `/${
-        token0Address === nativeCurrencyWrapper.symbol
-          ? nativeCurrency
-          : token0Address
-      }/${
-        token1Address === nativeCurrencyWrapper.symbol
-          ? nativeCurrency
-          : token1Address
+      `/${token0Address === nativeCurrencyWrapper.symbol
+        ? nativeCurrency
+        : token0Address
+      }/${token1Address === nativeCurrencyWrapper.symbol
+        ? nativeCurrency
+        : token1Address
       }?chainId=${ChainId[selectedNetwork]}`
     );
   }
@@ -84,17 +81,15 @@ export function getSwapLink(
   token1Address = null
 ) {
   if (!token1Address) {
-    return `https://app.honeyswap.org/#/swap?inputCurrency=${token0Address}&chainId=${ChainId[selectedNetwork]}`;
+    return `https://www.baoswap.xyz/#/swap?inputCurrency=${token0Address}&chainId=${ChainId[selectedNetwork]}`;
   } else {
-    return `https://app.honeyswap.org/#/swap?inputCurrency=${
-      token0Address === nativeCurrencyWrapper.symbol
-        ? nativeCurrency
-        : token0Address
-    }&outputCurrency=${
-      token1Address === nativeCurrencyWrapper.symbol
+    return `https://www.baoswap.xyz/#/swap?inputCurrency=${token0Address === nativeCurrencyWrapper.symbol
+      ? nativeCurrency
+      : token0Address
+      }&outputCurrency=${token1Address === nativeCurrencyWrapper.symbol
         ? nativeCurrency
         : token1Address
-    }&chainId=${ChainId[selectedNetwork]}`;
+      }&chainId=${ChainId[selectedNetwork]}`;
   }
 }
 
@@ -138,7 +133,7 @@ export function getExplorerLink(selectedNetwork, data, type) {
 }
 
 export function getSwaprAppLink(nativeCurrency, linkVariable, selectedNetwork) {
-  let baseSwaprUrl = "https://app.honeyswap.org/#/";
+  let baseSwaprUrl = "https://www.baoswap.xyz/#/";
   if (!linkVariable) {
     return baseSwaprUrl;
   }

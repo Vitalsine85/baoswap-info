@@ -62,7 +62,7 @@ const CandleStickChart = ({
   const dataPrev = usePrevious(data)
 
   const [darkMode] = useDarkModeManager()
-  const textColor = darkMode ? 'white' : 'black'
+  const textColor = darkMode ? '#50251c' : 'black'
   const previousTheme = usePrevious(darkMode)
 
   // reset the chart if theme switches
